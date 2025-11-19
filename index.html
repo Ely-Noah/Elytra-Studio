@@ -135,7 +135,24 @@
 
       // 🎬 GESTION DES CLICS SUR LA NAVBAR
       document.addEventListener('DOMContentLoaded', function() {
-        const navLinks = document.querySelectorAll('.nav-wrap a[href^="https"]');
+        const navbar = document.querySelector('.nav-wrap');
+        const navLinks = document.querySelectorAll('.nav-wrap a');
+        
+        // ⚠️ EMPÊCHER LES CLICS SUR LA GALERIE QUAND ON CLIQUE SUR LA NAVBAR
+        if (navbar) {
+          // Bloquer tous les événements sur la navbar pour qu'ils ne traversent pas
+          navbar.addEventListener('mousedown', function(e) {
+            e.stopPropagation();
+          }, true);
+          
+          navbar.addEventListener('touchstart', function(e) {
+            e.stopPropagation();
+          }, true);
+          
+          navbar.addEventListener('click', function(e) {
+            e.stopPropagation();
+          }, true);
+        }
         
         navLinks.forEach(link => {
           link.addEventListener('click', function(e) {
@@ -144,6 +161,7 @@
             // Si c'est un lien externe Webflow, utiliser la transition
             if (href && href.includes('webflow.io')) {
               e.preventDefault();
+              e.stopPropagation();
               
               const overlay = document.querySelector('.page-transition-overlay');
               const gallery = document.getElementById('gallery');

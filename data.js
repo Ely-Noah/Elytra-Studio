@@ -52,7 +52,7 @@ export const projects = [
     title: "Book Tons",
     images: ["./public/tonbook.webp", "./public/bookt2.webp"],
     year: 2025,
-    href: "./sample-project",
+    href: "https://portfolio-elytra.webflow.io/livre-tons",
     tags: ["ÉDITION", "PRINT", "DESIGN"],
   },
   {
