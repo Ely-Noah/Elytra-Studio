@@ -20,7 +20,7 @@ const IS_MOBILE_OR_TABLET = IS_MOBILE || IS_TABLET;
 const getResponsiveCellSize = () => {
   if (IS_MOBILE) return 0.55;
   if (IS_TABLET) return 0.6;
-  return 0.62;
+  return 0.58;
 };
 
 const config = {
