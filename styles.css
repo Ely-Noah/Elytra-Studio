@@ -287,24 +287,6 @@ body.dragging {
   pointer-events: none;
 }
 
-/* 🦋 LOGO ELYTRA */
-.elytra-logo {
-  width: 100px;
-  height: 40px;
-  margin-bottom: 4px;
-  opacity: 0.8;
-  transition: opacity 0.3s ease;
-}
-
-.elytra-logo:hover {
-  opacity: 1;
-}
-
-.status-line {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
 
 .status-dot {
   width: 8px;
