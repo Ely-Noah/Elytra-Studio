@@ -12,7 +12,7 @@
     <meta name="robots" content="index, follow" />
     <meta name="language" content="FR" />
 
-        <!-- 🌐 OPEN GRAPH (Facebook, LinkedIn, etc.) -->
+    <!-- 🌐 OPEN GRAPH (Facebook, LinkedIn, etc.) -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://elytra-studio.fr/" />
     <meta property="og:title" content="Elytra Studio - Creative Studio Design" />
@@ -23,13 +23,11 @@
     <meta property="og:site_name" content="Elytra Studio" />
     <meta property="og:locale" content="fr_FR" />
     
-    
     <!-- 📱 MOBILE & PWA -->
     <meta name="theme-color" content="#000000" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Elytra Studio" />
-    
     
     <!-- 🎨 FAVICON (plusieurs formats pour compatibilité) -->
     <link rel="icon" type="image/png" href="./public/favicon-96x96.png" sizes="96x96" />
@@ -177,9 +175,9 @@
     <div class="marquee-container">
       <div class="marquee-content">
         <span class="marquee-item">Creative Studio spécialisé en design graphique & branding</span>
-        <span class="marquee-item">Portfolio 2025 — 30+ projets créatifs</span>
+        <span class="marquee-item">Portfolio 2025 – 30+ projets créatifs</span>
         <span class="marquee-item">Design, Print, Packaging, Illustration, DA</span>
-        <span class="marquee-item">Elytra Studio — La Rochelle, Nouvelle-Aquitaine</span>
+        <span class="marquee-item">Elytra Studio – La Rochelle, Nouvelle-Aquitaine</span>
       </div>
     </div>
 
@@ -220,8 +218,6 @@
       <canvas id="globe-canvas"></canvas>
     </div>
 
-    <!-- 📅 ANNÉE EN COURS (supprimé) -->
-
     <!-- 🔄 INDICATEUR DE SCROLL (bas centre) -->
     <div class="scroll-indicator">
       <div class="scroll-text">Explore</div>
@@ -260,18 +256,21 @@
       const navbar = document.getElementById('navbar');
       
       if (hasVisited) {
-        // Si déjà visité : masquer immédiatement le loading et afficher la navbar
         loadingScreen.classList.add('hidden');
+        loadingScreen.style.display = 'none';
         navbar.classList.add('visible');
+        navbar.style.opacity = '1';
+        navbar.style.visibility = 'visible';
         console.log('✅ Returning visitor - skipping loading screen');
       } else {
-        // Première visite : afficher le loading screen
         console.log('🎬 First visit - showing loading screen');
         
         setTimeout(() => {
           loadingScreen.classList.add('hidden');
+          loadingScreen.style.display = 'none';
           navbar.classList.add('visible');
-          // Marquer comme visité dans la session
+          navbar.style.opacity = '1';
+          navbar.style.visibility = 'visible';
           sessionStorage.setItem('hasVisitedGallery', 'true');
           console.log('✅ Loading complete!');
         }, 5000);
@@ -282,9 +281,7 @@
         const navbar = document.querySelector('.nav-wrap');
         const navLinks = document.querySelectorAll('.nav-wrap a');
         
-        // ⚠️ EMPÊCHER LES CLICS SUR LA GALERIE QUAND ON CLIQUE SUR LA NAVBAR
         if (navbar) {
-          // Bloquer tous les événements sur la navbar pour qu'ils ne traversent pas
           navbar.addEventListener('mousedown', function(e) {
             e.stopPropagation();
           }, true);
@@ -302,27 +299,23 @@
           link.addEventListener('click', function(e) {
             const href = this.getAttribute('href');
             
-            // Si c'est un lien externe Webflow, utiliser la transition
-            if (href && href.includes('webflow.io')) {
+            if (href && (href.includes('works.elytra-studio.fr') || href.includes('webflow.io'))) {
               e.preventDefault();
               e.stopPropagation();
               
               const overlay = document.querySelector('.page-transition-overlay');
               const gallery = document.getElementById('gallery');
               
-              // Zoom arrière + fade
               if (gallery) {
                 gallery.style.transition = 'transform 0.8s cubic-bezier(0.77, 0, 0.175, 1), opacity 0.6s ease';
                 gallery.style.transform = 'scale(0.95)';
                 gallery.style.opacity = '0';
               }
               
-              // Overlay monte
               setTimeout(() => {
                 if (overlay) overlay.classList.add('active');
               }, 300);
               
-              // Navigation
               setTimeout(() => {
                 sessionStorage.setItem('fromGallery', 'true');
                 window.location.href = href;
@@ -330,34 +323,38 @@
             }
           });
         });
+        
+        setTimeout(() => {
+          if (navbar) {
+            navbar.style.opacity = '1';
+            navbar.style.visibility = 'visible';
+            navbar.classList.add('visible');
+            console.log('✅ Navbar forced visible');
+          }
+        }, 100);
       });
     </script>
 
     <!-- ✨ SCRIPT CURSEUR PERSONNALISÉ -->
     <script>
-      // 🎯 Curseur personnalisé (desktop uniquement)
       if (window.innerWidth > 768) {
         const cursor = document.querySelector('.custom-cursor');
         let mouseX = 0;
         let mouseY = 0;
         let cursorX = 0;
         let cursorY = 0;
-        const speed = 0.15; // Vitesse de suivi (plus bas = plus smooth)
+        const speed = 0.15;
 
-        // Suivi de la position de la souris
         document.addEventListener('mousemove', (e) => {
           mouseX = e.clientX;
           mouseY = e.clientY;
           
-          // Afficher le curseur au premier mouvement
           if (!cursor.classList.contains('visible')) {
             cursor.classList.add('visible');
           }
         });
 
-        // Animation smooth avec requestAnimationFrame
         function animateCursor() {
-          // Interpolation pour un mouvement fluide
           cursorX += (mouseX - cursorX) * speed;
           cursorY += (mouseY - cursorY) * speed;
           
@@ -368,7 +365,6 @@
         }
         animateCursor();
 
-        // Effet hover sur les liens et éléments cliquables
         const interactiveElements = document.querySelectorAll('a, button, .tab, [role="button"]');
         
         interactiveElements.forEach(el => {
@@ -381,7 +377,6 @@
           });
         });
 
-        // Masquer le curseur quand on quitte la fenêtre
         document.addEventListener('mouseleave', () => {
           cursor.style.opacity = '0';
         });
@@ -402,41 +397,36 @@
         
         function typeWriter() {
           if (!isDeleting) {
-            // Écrire
             emailElement.textContent = fullText.substring(0, charIndex);
             emailElement.classList.add('typing');
             charIndex++;
             
             if (charIndex > fullText.length) {
-              // Pause à la fin avant de supprimer
               emailElement.classList.remove('typing');
               setTimeout(() => {
                 isDeleting = true;
                 typeWriter();
-              }, 8000); // Pause de 8 secondes
+              }, 8000);
               return;
             }
             
-            setTimeout(typeWriter, 80); // Vitesse d'écriture
+            setTimeout(typeWriter, 80);
           } else {
-            // Supprimer
             emailElement.textContent = fullText.substring(0, charIndex);
             emailElement.classList.add('typing');
             charIndex--;
             
             if (charIndex < 0) {
-              // Recommencer l'écriture
               isDeleting = false;
               charIndex = 0;
-              setTimeout(typeWriter, 1000); // Pause avant de recommencer
+              setTimeout(typeWriter, 1000);
               return;
             }
             
-            setTimeout(typeWriter, 40); // Vitesse de suppression (plus rapide)
+            setTimeout(typeWriter, 40);
           }
         }
         
-        // Démarrer après le loading screen
         setTimeout(() => {
           typeWriter();
         }, 5000);
@@ -455,46 +445,42 @@
         }
       }
       
-      // Mettre à jour l'heure immédiatement puis toutes les secondes
       updateTime();
       setInterval(updateTime, 1000);
 
-      // 💓 Animation BPM dynamique (70-130 aléatoire à chaque refresh)
+      // 💓 Animation BPM dynamique
       function animateBPM() {
         const bpmElement = document.getElementById('bpm-value');
         if (!bpmElement) return;
         
-        // BPM de base aléatoire entre 70 et 130 à chaque refresh
-        const baseBPM = Math.floor(Math.random() * 61) + 70; // 70 à 130
+        const baseBPM = Math.floor(Math.random() * 61) + 70;
         let currentBPM = baseBPM;
         bpmElement.textContent = currentBPM;
         
-        // Variation légère autour du BPM de base
         setInterval(() => {
-          const variation = Math.floor(Math.random() * 7) - 3; // -3 à +3
+          const variation = Math.floor(Math.random() * 7) - 3;
           currentBPM = Math.max(baseBPM - 5, Math.min(baseBPM + 5, baseBPM + variation));
           bpmElement.textContent = currentBPM;
           
-          // Ajuster la vitesse du heartbeat en fonction du BPM
           const heartElement = document.querySelector('.bpm-heart');
           if (heartElement) {
-            const animationDuration = 60 / currentBPM; // Durée en secondes
+            const animationDuration = 60 / currentBPM;
             heartElement.style.animationDuration = animationDuration + 's';
           }
-        }, 2000); // Change toutes les 2 secondes
+        }, 2000);
       }
       
       animateBPM();
 
-      // 📊 Animation compteur de projets (compte jusqu'à 31)
+      // 📊 Animation compteur de projets
       function animateCounter() {
         const counterElement = document.getElementById('project-count');
         if (!counterElement) return;
         
         let count = 0;
         const target = 31;
-        const duration = 2500; // 2.5 secondes pour bien voir
-        const increment = target / (duration / 16); // 60fps
+        const duration = 2500;
+        const increment = target / (duration / 16);
         
         const timer = setInterval(() => {
           count += increment;
@@ -506,10 +492,9 @@
         }, 16);
       }
       
-      // ⚠️ IMPORTANT: Démarrer le compteur SEULEMENT après le loading screen (5 secondes)
       setTimeout(() => {
         animateCounter();
-      }, 5100); // 5s loading + 100ms délai
+      }, 5100);
 
       // 🔄 Masquer le scroll indicator après scroll
       let hasScrolled = false;
@@ -536,18 +521,15 @@
         let currentY = 0;
         
         document.addEventListener('mousemove', (e) => {
-          // Normaliser les coordonnées entre -1 et 1
           mouseX = (e.clientX / window.innerWidth) * 2 - 1;
           mouseY = (e.clientY / window.innerHeight) * 2 - 1;
         });
         
         function animateCameraParallax() {
-          // Interpolation fluide
           currentX += (mouseX - currentX) * 0.05;
           currentY += (mouseY - currentY) * 0.05;
           
-          // Appliquer le mouvement (très subtil)
-          const moveX = currentX * 15; // 15px max de déplacement
+          const moveX = currentX * 15;
           const moveY = currentY * 15;
           
           gallery.style.transform = `translate(${moveX}px, ${moveY}px)`;
@@ -559,27 +541,21 @@
       }
 
       // 🎨 EFFET BLUR COLORÉ AU HOVER DES PROJETS
-      // Ce script doit être adapté à votre galerie Three.js
-      // Il détecte le hover des projets et applique un blur coloré
       if (window.innerWidth > 768) {
         const blurContainer = document.getElementById('projectBlur');
         const blurGradient = document.getElementById('blurGradient');
         
         let isHovering = false;
         
-        // Cette fonction est appelée depuis votre script.js
-        // quand un projet est survolé
         window.onProjectHover = function(position, isEnter, colors) {
           if (isEnter && colors) {
             isHovering = true;
             blurContainer.classList.add('active');
             
-            // Positionner le blur au centre du curseur
             blurGradient.style.left = position.x + 'px';
             blurGradient.style.top = position.y + 'px';
             blurGradient.style.transform = 'translate(-50%, -50%)';
             
-            // Appliquer les couleurs du projet
             blurGradient.style.background = `radial-gradient(circle, ${colors[0]}, ${colors[1]})`;
           } else {
             isHovering = false;
@@ -587,7 +563,6 @@
           }
         };
         
-        // Suivre le curseur quand on hover
         document.addEventListener('mousemove', (e) => {
           if (isHovering) {
             blurGradient.style.left = e.clientX + 'px';
@@ -599,24 +574,20 @@
 
     <!-- 🌍 SCRIPT GLOBE 3D -->
     <script type="module">
-      import * as THREE from 'three';
+      import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.177.0/build/three.module.js';
 
-      // 🌍 Globe 3D minimaliste et synchronisé
       if (window.innerWidth > 768) {
         const canvas = document.getElementById('globe-canvas');
         if (canvas) {
+          console.log('🌍 Initializing globe...');
           const container = canvas.parentElement;
           const width = container.offsetWidth;
           const height = container.offsetHeight;
 
-          // Scène
           const scene = new THREE.Scene();
-
-          // Caméra
           const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 1000);
           camera.position.z = 2.2;
 
-          // Renderer
           const renderer = new THREE.WebGLRenderer({
             canvas: canvas,
             alpha: true,
@@ -625,7 +596,6 @@
           renderer.setSize(width, height);
           renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-          // Globe minimaliste (sphère wireframe simple)
           const geometry = new THREE.SphereGeometry(0.9, 24, 24);
           const material = new THREE.MeshBasicMaterial({
             color: 0xffffff,
@@ -636,14 +606,12 @@
           const globe = new THREE.Mesh(geometry, material);
           scene.add(globe);
 
-          // Variables pour la rotation
           let targetRotationX = 0;
           let targetRotationY = 0;
           let currentRotationX = 0;
           let currentRotationY = 0;
           const dampingFactor = 0.08;
 
-          // 🎯 SYNCHRONISATION AVEC LE SCROLL DE LA PAGE
           let lastScrollY = window.scrollY;
           let lastScrollX = window.scrollX;
           
@@ -658,81 +626,39 @@
             lastScrollX = window.scrollX;
           });
 
-          // 🎯 SYNCHRONISATION AVEC LE DRAG DE LA GALERIE (via mousemove global)
           let lastMouseX = 0;
           let lastMouseY = 0;
-          let isMouseMoving = false;
-          let mouseMoveTimeout;
 
           document.addEventListener('mousemove', (e) => {
             const deltaX = e.clientX - lastMouseX;
             const deltaY = e.clientY - lastMouseY;
             
-            // Seulement si le mouvement est significatif
             if (Math.abs(deltaX) > 2 || Math.abs(deltaY) > 2) {
               targetRotationY += deltaX * 0.0008;
               targetRotationX -= deltaY * 0.0008;
-              isMouseMoving = true;
-              
-              clearTimeout(mouseMoveTimeout);
-              mouseMoveTimeout = setTimeout(() => {
-                isMouseMoving = false;
-              }, 150);
             }
             
             lastMouseX = e.clientX;
             lastMouseY = e.clientY;
           });
 
-          // 🎯 SYNCHRONISATION AVEC LE TOUCH/DRAG MOBILE
-          let lastTouchX = 0;
-          let lastTouchY = 0;
-
-          document.addEventListener('touchmove', (e) => {
-            if (e.touches.length === 1) {
-              const touch = e.touches[0];
-              const deltaX = touch.clientX - lastTouchX;
-              const deltaY = touch.clientY - lastTouchY;
-              
-              if (Math.abs(deltaX) > 1 || Math.abs(deltaY) > 1) {
-                targetRotationY += deltaX * 0.001;
-                targetRotationX -= deltaY * 0.001;
-              }
-              
-              lastTouchX = touch.clientX;
-              lastTouchY = touch.clientY;
-            }
-          });
-
-          document.addEventListener('touchstart', (e) => {
-            if (e.touches.length === 1) {
-              lastTouchX = e.touches[0].clientX;
-              lastTouchY = e.touches[0].clientY;
-            }
-          });
-
-          // Rotation automatique douce quand pas d'interaction
           const autoRotateSpeed = 0.001;
           let lastActivityTime = Date.now();
           
-          // Mettre à jour le temps d'activité
           ['scroll', 'mousemove', 'touchmove'].forEach(event => {
             document.addEventListener(event, () => {
               lastActivityTime = Date.now();
             });
           });
 
-          // Animation
           function animate() {
             requestAnimationFrame(animate);
 
-            // Si pas d'activité depuis 3 secondes, rotation auto
             const timeSinceActivity = Date.now() - lastActivityTime;
             if (timeSinceActivity > 3000) {
               targetRotationY += autoRotateSpeed;
             }
 
-            // Interpolation fluide (damping)
             currentRotationX += (targetRotationX - currentRotationX) * dampingFactor;
             currentRotationY += (targetRotationY - currentRotationY) * dampingFactor;
 
@@ -743,8 +669,8 @@
           }
 
           animate();
+          console.log('✅ Globe initialized successfully');
 
-          // Responsive
           window.addEventListener('resize', () => {
             if (window.innerWidth > 768) {
               const newWidth = container.offsetWidth;
@@ -754,6 +680,8 @@
               renderer.setSize(newWidth, newHeight);
             }
           });
+        } else {
+          console.error('❌ Globe canvas not found');
         }
       }
     </script>

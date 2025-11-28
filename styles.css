@@ -72,10 +72,9 @@ body.dragging {
   width: 100%;
   height: 100%;
   background: #000000;
-  z-index: 999998; /* Juste en dessous de la navbar */
+  z-index: 999998;
   pointer-events: none;
   
-  /* Commence en bas, caché */
   transform: translateY(100%);
   transition: transform 0.8s cubic-bezier(0.77, 0, 0.175, 1);
   
@@ -84,13 +83,11 @@ body.dragging {
   justify-content: center;
 }
 
-/* Quand actif, monte du bas vers le haut */
 .page-transition-overlay.active {
   transform: translateY(0);
   pointer-events: all;
 }
 
-/* Loader */
 .transition-loader {
   font-family: "Outfit", sans-serif;
   font-size: 16px;
@@ -118,7 +115,7 @@ body.dragging {
   border: 1px solid rgba(255, 255, 255, 0.18);
   backdrop-filter: blur(20px) saturate(150%);
   -webkit-backdrop-filter: blur(20px) saturate(150%);
-  z-index: 2147483647; /* Au-dessus de tout, même l'overlay */
+  z-index: 2147483647;
   pointer-events: auto;
   isolation: isolate;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3),
@@ -267,7 +264,6 @@ body.dragging {
   opacity: 1;
 }
 
-/* Hover sur les liens : curseur plus grand */
 .custom-cursor.hover {
   width: 40px;
   height: 40px;
@@ -349,7 +345,6 @@ body.dragging {
   max-width: 220px;
 }
 
-/* Le curseur clignotant sera géré en JS */
 .email-typewriter.typing::after {
   content: '|';
   animation: blink 0.75s step-end infinite;
@@ -446,7 +441,6 @@ body.dragging {
   white-space: nowrap;
 }
 
-/* Délais pour chaque item (5 items, cycle de 15s) */
 .rotating-text-item:nth-child(1) { animation-delay: 0s; }
 .rotating-text-item:nth-child(2) { animation-delay: 3s; }
 .rotating-text-item:nth-child(3) { animation-delay: 6s; }
@@ -499,7 +493,6 @@ body.dragging {
   animation: fadeInOutMarquee 16s ease-in-out infinite;
 }
 
-/* Délais pour chaque item (4 items × 4s = 16s total) */
 .marquee-item:nth-child(1) { animation-delay: 0s; }
 .marquee-item:nth-child(2) { animation-delay: 4s; }
 .marquee-item:nth-child(3) { animation-delay: 8s; }
@@ -548,11 +541,10 @@ body.dragging {
   pointer-events: none;
 }
 
-/* 📱 RESPONSIVE : MASQUER EN MOBILE */
+/* 📱 RESPONSIVE : AFFICHER UNIQUEMENT LES TAGS ROTATIFS EN MOBILE */
 @media (max-width: 768px) {
   .custom-cursor,
   .marquee-container,
-  .rotating-text,
   .status-indicator,
   .location-time,
   .bpm-indicator,
@@ -564,7 +556,18 @@ body.dragging {
     display: none !important;
   }
   
-  /* Rétablir le curseur système sur mobile */
+  /* 🔄 GARDER UNIQUEMENT LES TAGS ROTATIFS EN MOBILE */
+  .rotating-text {
+    display: flex !important;
+    top: 20px;
+    z-index: 1000;
+  }
+  
+  .rotating-text-item {
+    font-size: 8px;
+    letter-spacing: 0.18em;
+  }
+  
   body, body * {
     cursor: auto !important;
   }
@@ -614,7 +617,6 @@ body.dragging {
   pointer-events: none;
 }
 
-/* Onde en pixels ronds */
 .bpm-wave {
   display: flex;
   align-items: center;
@@ -670,7 +672,7 @@ body.dragging {
   display: none;
 }
 
-/* 🌍 8. GLOBE 3D INTERACTIF MINIMALISTE (BAS DROITE) */
+/* 🌍 8. GLOBE 3D INTERACTIF MINIMALISTE (BAS DROITE) - FIXÉ */
 .globe-container {
   position: fixed;
   bottom: 22px;
@@ -679,18 +681,18 @@ body.dragging {
   height: 55px;
   z-index: 10;
   pointer-events: none;
-  opacity: 0.5;
+  opacity: 0.6;
   transition: opacity 0.3s ease;
 }
 
 .globe-container:hover {
-  opacity: 0.7;
+  opacity: 0.8;
 }
 
 #globe-canvas {
-  width: 100%;
-  height: 100%;
-  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  display: block !important;
 }
 
 /* 🔄 9. SCROLL PROGRESS CIRCULAIRE (DÉSACTIVÉ) */
@@ -870,5 +872,76 @@ body.dragging {
   
   .marquee-item {
     font-size: 8px;
+  }
+}
+
+/* ========================================
+   🔧 CORRECTIONS GITHUB PAGES
+   ======================================== */
+
+.nav-wrap {
+  position: fixed !important;
+  bottom: 20px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  z-index: 2147483647 !important;
+  pointer-events: auto !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.loading-screen.hidden {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  display: none !important;
+}
+
+.nav-wrap.visible {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+}
+
+.status-indicator,
+.location-time,
+.rotating-text,
+.marquee-container,
+.project-counter,
+.bpm-indicator,
+.globe-container,
+.scroll-indicator {
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+#gallery {
+  position: relative !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  height: 100svh !important;
+  transform: scale(1) !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+#gallery canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block !important;
+}
+
+.page-transition-overlay {
+  transform: translateY(100%) !important;
+  pointer-events: none !important;
+}
+
+@supports (-webkit-touch-callout: none) {
+  #gallery {
+    height: -webkit-fill-available !important;
+  }
+  
+  body {
+    height: -webkit-fill-available !important;
   }
 }
