@@ -236,3 +236,639 @@ body.dragging {
     font-size: 12px;
   }
 }
+
+/* ========================================
+   🎯 MICRO-INFOS ANIMÉES (DESKTOP ONLY)
+   ======================================== */
+
+/* 🚫 Curseur système caché en desktop */
+@media (min-width: 769px) {
+  body, body * {
+    cursor: none !important;
+  }
+}
+
+/* ✨ CURSEUR PERSONNALISÉ */
+.custom-cursor {
+  position: fixed;
+  width: 24px;
+  height: 24px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999999;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s ease, height 0.3s ease, border-width 0.3s ease;
+  mix-blend-mode: difference;
+  opacity: 0;
+}
+
+.custom-cursor.visible {
+  opacity: 1;
+}
+
+/* Hover sur les liens : curseur plus grand */
+.custom-cursor.hover {
+  width: 40px;
+  height: 40px;
+  border-width: 1px;
+}
+
+/* 💚 1. STATUT AVEC POINT PULSÉ (HAUT GAUCHE) */
+.status-indicator {
+  position: fixed;
+  top: 30px;
+  left: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* 🦋 LOGO ELYTRA */
+.elytra-logo {
+  width: 100px;
+  height: 40px;
+  margin-bottom: 4px;
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+}
+
+.elytra-logo:hover {
+  opacity: 1;
+}
+
+.status-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  background: #4ade80;
+  border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+  box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.4);
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7);
+  }
+  50% {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 8px rgba(74, 222, 128, 0);
+  }
+}
+
+.status-text {
+  font-family: 'Outfit', sans-serif;
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #fff;
+  opacity: 0.6;
+}
+
+/* ✉️ EMAIL AVEC ANIMATION TYPEWRITER EN BOUCLE */
+.email-typewriter {
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  color: #fff;
+  opacity: 0.65;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 220px;
+}
+
+/* Le curseur clignotant sera géré en JS */
+.email-typewriter.typing::after {
+  content: '|';
+  animation: blink 0.75s step-end infinite;
+  margin-left: 2px;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* 📍 2. LOCALISATION + HEURE (HAUT DROITE) */
+.location-time {
+  position: fixed;
+  top: 30px;
+  right: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.location-text {
+  font-family: 'Outfit', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #fff;
+  opacity: 0.75;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.location-dot {
+  width: 6px;
+  height: 6px;
+  background: #3b82f6;
+  border-radius: 50%;
+  opacity: 1;
+  animation: locationPulse 2s ease-in-out infinite;
+  box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+}
+
+@keyframes locationPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+  }
+  50% {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 6px rgba(59, 130, 246, 0);
+  }
+}
+
+.time-text {
+  font-family: 'Outfit', sans-serif;
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  color: #fff;
+  opacity: 0.5;
+}
+
+/* 🔄 3. TAGS ROTATIFS (CENTRE HAUT) */
+.rotating-text {
+  position: fixed;
+  top: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  pointer-events: none;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.rotating-text-item {
+  font-family: 'Outfit', sans-serif;
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #fff;
+  opacity: 0;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: fadeInOutTag 15s ease-in-out infinite;
+  white-space: nowrap;
+}
+
+/* Délais pour chaque item (5 items, cycle de 15s) */
+.rotating-text-item:nth-child(1) { animation-delay: 0s; }
+.rotating-text-item:nth-child(2) { animation-delay: 3s; }
+.rotating-text-item:nth-child(3) { animation-delay: 6s; }
+.rotating-text-item:nth-child(4) { animation-delay: 9s; }
+.rotating-text-item:nth-child(5) { animation-delay: 12s; }
+
+@keyframes fadeInOutTag {
+  0%, 100% { opacity: 0; transform: translateX(-50%) translateY(3px); }
+  6%, 14% { opacity: 0.65; transform: translateX(-50%) translateY(0); }
+  20%, 100% { opacity: 0; transform: translateX(-50%) translateY(-3px); }
+}
+
+/* 📜 4. DESCRIPTION STUDIO (LIGNE DU BAS) */
+.marquee-container {
+  position: fixed;
+  top: 55px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: auto;
+  max-width: 900px;
+  overflow: hidden;
+  z-index: 10;
+  pointer-events: none;
+  opacity: 0.5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 16px;
+}
+
+.marquee-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.marquee-item {
+  font-family: 'Outfit', sans-serif;
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #fff;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+  opacity: 0;
+  animation: fadeInOutMarquee 16s ease-in-out infinite;
+}
+
+/* Délais pour chaque item (4 items × 4s = 16s total) */
+.marquee-item:nth-child(1) { animation-delay: 0s; }
+.marquee-item:nth-child(2) { animation-delay: 4s; }
+.marquee-item:nth-child(3) { animation-delay: 8s; }
+.marquee-item:nth-child(4) { animation-delay: 12s; }
+
+@keyframes fadeInOutMarquee {
+  0%, 100% { 
+    opacity: 0; 
+    transform: translate(-50%, -50%) translateY(5px);
+  }
+  6%, 19% { 
+    opacity: 0.6; 
+    transform: translate(-50%, -50%) translateY(0);
+  }
+  25%, 100% { 
+    opacity: 0; 
+    transform: translate(-50%, -50%) translateY(-5px);
+  }
+}
+
+/* 🎨 EFFET GAUSSIAN BLUR COLORÉ AU HOVER DES PROJETS */
+.project-hover-blur {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 5;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.project-hover-blur.active {
+  opacity: 1;
+}
+
+.blur-gradient {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.3;
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+/* 📱 RESPONSIVE : MASQUER EN MOBILE */
+@media (max-width: 768px) {
+  .custom-cursor,
+  .marquee-container,
+  .rotating-text,
+  .status-indicator,
+  .location-time,
+  .bpm-indicator,
+  .project-counter,
+  .scroll-indicator,
+  .globe-container,
+  .floating-particles,
+  .project-hover-blur {
+    display: none !important;
+  }
+  
+  /* Rétablir le curseur système sur mobile */
+  body, body * {
+    cursor: auto !important;
+  }
+}
+
+/* 📊 5. COMPTEUR DE PROJETS (BAS GAUCHE - AU-DESSUS DU BPM) */
+.project-counter {
+  position: fixed;
+  bottom: 60px;
+  left: 40px;
+  z-index: 10;
+  pointer-events: none;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.counter-value {
+  font-family: 'Outfit', sans-serif;
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #fff;
+  opacity: 0.9;
+  line-height: 1;
+}
+
+.counter-label {
+  font-family: 'Outfit', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #fff;
+  opacity: 0.55;
+}
+
+/* 💓 6. INDICATEUR BPM AVEC ONDE PIXEL (BAS GAUCHE - SOUS LE COMPTEUR) */
+.bpm-indicator {
+  position: fixed;
+  bottom: 30px;
+  left: 40px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* Onde en pixels ronds */
+.bpm-wave {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 16px;
+}
+
+.bpm-dot {
+  width: 3px;
+  height: 3px;
+  background: #ef4444;
+  border-radius: 50%;
+  animation: bpmPulse 1.2s ease-in-out infinite;
+}
+
+.bpm-dot:nth-child(1) { animation-delay: 0s; }
+.bpm-dot:nth-child(2) { animation-delay: 0.1s; }
+.bpm-dot:nth-child(3) { animation-delay: 0.2s; }
+.bpm-dot:nth-child(4) { animation-delay: 0.3s; }
+.bpm-dot:nth-child(5) { animation-delay: 0.4s; }
+.bpm-dot:nth-child(6) { animation-delay: 0.3s; }
+.bpm-dot:nth-child(7) { animation-delay: 0.2s; }
+.bpm-dot:nth-child(8) { animation-delay: 0.1s; }
+
+@keyframes bpmPulse {
+  0%, 100% { 
+    transform: scaleY(1);
+    opacity: 0.5;
+  }
+  50% { 
+    transform: scaleY(4);
+    opacity: 1;
+  }
+}
+
+.bpm-text {
+  font-family: 'Outfit', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  color: #fff;
+  opacity: 0.65;
+}
+
+.bpm-value {
+  font-weight: 600;
+  color: #ef4444;
+  margin-right: 4px;
+}
+
+/* 📅 7. ANNÉE EN COURS (SUPPRIMÉE - plus besoin) */
+.year-display {
+  display: none;
+}
+
+/* 🌍 8. GLOBE 3D INTERACTIF MINIMALISTE (BAS DROITE) */
+.globe-container {
+  position: fixed;
+  bottom: 22px;
+  right: 40px;
+  width: 55px;
+  height: 55px;
+  z-index: 10;
+  pointer-events: none;
+  opacity: 0.5;
+  transition: opacity 0.3s ease;
+}
+
+.globe-container:hover {
+  opacity: 0.7;
+}
+
+#globe-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* 🔄 9. SCROLL PROGRESS CIRCULAIRE (DÉSACTIVÉ) */
+.scroll-progress {
+  display: none;
+}
+
+/* 🔄 9. INDICATEUR DE SCROLL (BAS CENTRE) */
+.scroll-indicator {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  opacity: 0.6;
+  animation: scrollBounce 2s ease-in-out infinite;
+}
+
+.scroll-text {
+  font-family: 'Outfit', sans-serif;
+  font-size: 8px;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #fff;
+  opacity: 0.7;
+}
+
+.scroll-mouse {
+  width: 20px;
+  height: 30px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-radius: 12px;
+  position: relative;
+}
+
+.scroll-wheel {
+  width: 3px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 2px;
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: scrollWheel 1.5s ease-in-out infinite;
+}
+
+@keyframes scrollBounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(5px); }
+}
+
+@keyframes scrollWheel {
+  0% { top: 6px; opacity: 1; }
+  100% { top: 16px; opacity: 0; }
+}
+
+/* ⚡ 10. PARTICULES FLOTTANTES (FOND) */
+.floating-particles {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  animation: float 20s linear infinite;
+}
+
+.particle:nth-child(1) { left: 10%; animation-delay: 0s; animation-duration: 18s; }
+.particle:nth-child(2) { left: 20%; animation-delay: 2s; animation-duration: 22s; }
+.particle:nth-child(3) { left: 30%; animation-delay: 4s; animation-duration: 20s; }
+.particle:nth-child(4) { left: 40%; animation-delay: 1s; animation-duration: 25s; }
+.particle:nth-child(5) { left: 50%; animation-delay: 3s; animation-duration: 19s; }
+.particle:nth-child(6) { left: 60%; animation-delay: 5s; animation-duration: 23s; }
+.particle:nth-child(7) { left: 70%; animation-delay: 2s; animation-duration: 21s; }
+.particle:nth-child(8) { left: 80%; animation-delay: 4s; animation-duration: 24s; }
+.particle:nth-child(9) { left: 90%; animation-delay: 1s; animation-duration: 20s; }
+.particle:nth-child(10) { left: 15%; animation-delay: 3s; animation-duration: 22s; }
+
+@keyframes float {
+  0% {
+    transform: translateY(100vh) translateX(0) scale(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.6;
+  }
+  90% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-100px) translateX(100px) scale(1);
+    opacity: 0;
+  }
+}
+
+/* 🎨 AJUSTEMENTS POUR PETITS ÉCRANS DESKTOP */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .status-indicator {
+    left: 25px;
+    top: 25px;
+  }
+  
+  .location-time {
+    right: 25px;
+    top: 25px;
+  }
+  
+  .rotating-text {
+    top: 23px;
+  }
+  
+  .marquee-container {
+    top: 48px;
+    max-width: 600px;
+  }
+  
+  .wave-line {
+    bottom: 26px;
+    right: 25px;
+    width: 100px;
+  }
+  
+  .globe-container {
+    bottom: 18px;
+    right: 25px;
+    width: 50px;
+    height: 50px;
+  }
+  
+  .bpm-indicator {
+    left: 25px;
+    bottom: 26px;
+  }
+  
+  .project-counter {
+    left: 25px;
+    bottom: 52px;
+  }
+  
+  .scroll-progress {
+    left: 25px;
+    top: 60px;
+    width: 40px;
+    height: 40px;
+  }
+  
+  .counter-value {
+    font-size: 16px;
+  }
+  
+  .status-text,
+  .location-text {
+    font-size: 9px;
+  }
+  
+  .time-text {
+    font-size: 8px;
+  }
+  
+  .rotating-text-item {
+    font-size: 8px;
+  }
+  
+  .marquee-item {
+    font-size: 8px;
+  }
+}

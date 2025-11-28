@@ -20,7 +20,7 @@ const IS_MOBILE_OR_TABLET = IS_MOBILE || IS_TABLET;
 const getResponsiveCellSize = () => {
   if (IS_MOBILE) return 0.55;
   if (IS_TABLET) return 0.6;
-  return 0.65;
+  return 0.62;
 };
 
 const config = {
@@ -50,6 +50,14 @@ let currentImageIndices = [];
 let allImageTextures = [];
 let globalRotationTimer = null;
 let isRotationPaused = false;
+
+// 📷 Variables pour le mouvement de caméra suivant la souris
+let cameraTargetX = 0;
+let cameraTargetY = 0;
+let currentCameraX = 0;
+let currentCameraY = 0;
+const cameraFollowSpeed = 0.05;
+const cameraMaxMove = 0.08;
 
 const rgbaToArray = (rgba) => {
   const match = rgba.match(/rgba?\(([^)]+)\)/);
@@ -208,18 +216,17 @@ const createTextureAtlas = (textures, isText = false) => {
   const canvas = document.createElement("canvas");
   canvas.width = canvas.height = atlasSize * textureSize;
   const ctx = canvas.getContext("2d", {
-    alpha: isText,
+    alpha: true, // ✨ TOUJOURS true pour supporter la transparence
     desynchronized: false,
     willReadFrequently: false
   });
 
+  // ✨ Ne PAS remplir de noir, laisser transparent
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
   if (isText) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
-  } else {
-    ctx.fillStyle = "black";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
 
   textures.forEach((texture, index) => {
@@ -427,6 +434,15 @@ const updateMousePosition = (event) => {
     mousePosition.x,
     mousePosition.y
   );
+  
+  // 📷 Mouvement de caméra qui suit la souris
+  if (!isDragging && !IS_MOBILE_OR_TABLET) {
+    const normalizedX = (event.clientX / window.innerWidth) * 2 - 1;
+    const normalizedY = -(event.clientY / window.innerHeight) * 2 + 1;
+    
+    cameraTargetX = normalizedX * cameraMaxMove;
+    cameraTargetY = normalizedY * cameraMaxMove;
+  }
 };
 
 const startDrag = (x, y) => {
@@ -437,6 +453,9 @@ const startDrag = (x, y) => {
   previousMouse.x = x;
   previousMouse.y = y;
   setTimeout(() => isDragging && (targetZoom = config.zoomLevel), 150);
+  
+  cameraTargetX = 0;
+  cameraTargetY = 0;
 };
 
 const onPointerDown = (e) => startDrag(e.clientX, e.clientY);
@@ -597,6 +616,9 @@ const setupEventListeners = () => {
   renderer.domElement.addEventListener("mouseleave", () => {
     mousePosition.x = mousePosition.y = -1;
     plane?.material.uniforms.uMousePos.value.set(-1, -1);
+    
+    cameraTargetX = 0;
+    cameraTargetY = 0;
   });
   
   window.addEventListener("beforeunload", cleanup);
@@ -616,9 +638,28 @@ const animate = () => {
   offset.y += (targetOffset.y - offset.y) * config.lerpFactor;
   zoomLevel += (targetZoom - zoomLevel) * config.lerpFactor;
 
-  if (plane?.material.uniforms) {
-    plane.material.uniforms.uOffset.value.set(offset.x, offset.y);
-    plane.material.uniforms.uZoom.value = zoomLevel;
+  // 📷 Mouvement de caméra
+  if (!isDragging && !IS_MOBILE_OR_TABLET) {
+    currentCameraX += (cameraTargetX - currentCameraX) * cameraFollowSpeed;
+    currentCameraY += (cameraTargetY - currentCameraY) * cameraFollowSpeed;
+    
+    const finalOffsetX = offset.x + currentCameraX;
+    const finalOffsetY = offset.y + currentCameraY;
+    
+    if (plane?.material.uniforms) {
+      plane.material.uniforms.uOffset.value.set(finalOffsetX, finalOffsetY);
+      plane.material.uniforms.uZoom.value = zoomLevel;
+      plane.material.uniforms.uTime.value = performance.now() / 1000.0; // 💫 Update time pour la vague
+    }
+  } else {
+    currentCameraX *= 0.95;
+    currentCameraY *= 0.95;
+    
+    if (plane?.material.uniforms) {
+      plane.material.uniforms.uOffset.value.set(offset.x, offset.y);
+      plane.material.uniforms.uZoom.value = zoomLevel;
+      plane.material.uniforms.uTime.value = performance.now() / 1000.0; // 💫 Update time pour la vague
+    }
   }
 
   renderer.render(scene, camera);
@@ -691,6 +732,7 @@ const init = async () => {
       uImageAtlas: { value: imageAtlas },
       uTextAtlas: { value: textAtlas },
       uTagsAtlas: { value: tagsAtlas },
+      uTime: { value: 0.0 }, // 💫 Pour l'animation de la vague
     };
 
     const geometry = new THREE.PlaneGeometry(2, 2);

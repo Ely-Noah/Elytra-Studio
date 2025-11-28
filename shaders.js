@@ -19,13 +19,14 @@ export const fragmentShader = `
   uniform sampler2D uImageAtlas;
   uniform sampler2D uTextAtlas;
   uniform sampler2D uTagsAtlas;
+  uniform float uTime;
   varying vec2 vUv;
   
   void main() {
     vec2 screenUV = (vUv - 0.5) * 2.0;
     
     float radius = length(screenUV);
-    float distortion = 1.0 - 0.13 * radius * radius - 0.03 * radius * radius;
+    float distortion = 1.0 - 0.13 * radius * radius - 0.05;
     vec2 distortedUV = screenUV * distortion;
     
     vec2 aspectRatio = vec2(uResolution.x / uResolution.y, 1.0);
@@ -59,8 +60,27 @@ export const fragmentShader = `
     bool isHovered = hoverIntensity > 0.0 && uMousePos.x >= 0.0;
     
     vec3 backgroundColor = uBackgroundColor.rgb;
+    
+    // 💫 ONDE CIRCULAIRE
     if (isHovered) {
-      backgroundColor = mix(uBackgroundColor.rgb, uHoverColor.rgb, hoverIntensity * uHoverColor.a);
+      vec2 cellCenterLocal = vec2(0.5, 0.5);
+      float distFromCenter = length(cellUV - cellCenterLocal);
+      
+      float waveSpeed = 1.5;
+      float waveRadius = mod(uTime * waveSpeed, 1.5);
+      
+      float distToWave = abs(distFromCenter - waveRadius);
+      float waveWidth = 0.25;
+      float waveIntensity = smoothstep(waveWidth, 0.0, distToWave);
+      
+      float fadeFactor = 1.0 - smoothstep(0.5, 1.0, waveRadius);
+      waveIntensity *= fadeFactor;
+      
+      float centerPulse = smoothstep(0.3, 0.0, distFromCenter) * 0.3;
+      
+      float finalIntensity = (waveIntensity + centerPulse) * hoverIntensity * 0.5;
+      
+      backgroundColor = mix(backgroundColor, uHoverColor.rgb, finalIntensity);
     }
     
     float lineWidth = 0.005;
@@ -68,7 +88,7 @@ export const fragmentShader = `
     float gridY = smoothstep(0.0, lineWidth, cellUV.y) * smoothstep(0.0, lineWidth, 1.0 - cellUV.y);
     float gridMask = gridX * gridY;
     
-    float imageSize = 0.6;
+    float imageSize = 0.68;
     float imageBorder = (1.0 - imageSize) * 0.5;
     
     vec2 imageUV = (cellUV - imageBorder) / imageSize;
@@ -80,17 +100,14 @@ export const fragmentShader = `
     
     bool inImageArea = imageUV.x >= 0.0 && imageUV.x <= 1.0 && imageUV.y >= 0.0 && imageUV.y <= 1.0;
     
-    // Text area at top
     float textHeight = 0.08;
     float textY = 0.88;
     bool inTextArea = cellUV.x >= 0.05 && cellUV.x <= 0.95 && cellUV.y >= textY && cellUV.y <= (textY + textHeight);
     
-    // Tags area at bottom left
     float tagsHeight = 0.06;
     float tagsY = 0.05;
     bool inTagsArea = cellUV.x >= 0.05 && cellUV.x <= 0.75 && cellUV.y >= tagsY && cellUV.y <= (tagsY + tagsHeight);
     
-    // Direct mapping: cell (0,0) = project 0, cell (1,0) = project 1, etc.
     float texIndex = mod(cellId.x + cellId.y * 5.0, uTextureCount);
     
     vec3 color = backgroundColor;
@@ -101,8 +118,11 @@ export const fragmentShader = `
       vec2 atlasPos = vec2(mod(texIndex, atlasSize), floor(texIndex / atlasSize));
       vec2 atlasUV = (atlasPos + flippedImageUV) / atlasSize;
       
-      vec3 imageColor = texture2D(uImageAtlas, atlasUV).rgb;
-      color = mix(color, imageColor, imageAlpha);
+      vec4 imageColorWithAlpha = texture2D(uImageAtlas, atlasUV);
+      vec3 imageColor = imageColorWithAlpha.rgb;
+      float imageTransparency = imageColorWithAlpha.a;
+      
+      color = mix(color, imageColor, imageAlpha * imageTransparency);
     }
     
     if (inTextArea) {
@@ -119,7 +139,6 @@ export const fragmentShader = `
       color = mix(textBgColor, textColor.rgb, textColor.a);
     }
     
-    // Render tags at bottom left
     if (inTagsArea) {
       vec2 tagsCoord = vec2((cellUV.x - 0.05) / 0.7, (cellUV.y - tagsY) / tagsHeight);
       tagsCoord.y = 1.0 - tagsCoord.y;
