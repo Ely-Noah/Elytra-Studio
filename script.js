@@ -790,18 +790,40 @@ const init = async () => {
 
 init();
 
-// 🔙 GESTION DU RETOUR VERS LA GALERIE
+// 🔙 GESTION DU RETOUR VERS LA GALERIE (CORRIGÉ - OVERLAY REDESCEND)
 window.addEventListener('pageshow', function(event) {
   const fromGallery = sessionStorage.getItem('fromGallery');
   const gallery = document.getElementById('gallery');
   const navbar = document.querySelector('.nav-wrap');
+  const overlay = document.querySelector('.page-transition-overlay');
   
   if (fromGallery === 'true' || event.persisted) {
     console.log('🔙 Returning to gallery');
     
-    // Réinitialiser le style immédiatement
+    // ⚠️ CRITIQUE : Réactiver le parallaxe
+    window.isTransitioning = false;
+    
+    // ⚠️ CRITIQUE : Faire redescendre l'overlay IMMÉDIATEMENT
+    if (overlay) {
+      // Retirer la classe active
+      overlay.classList.remove('active');
+      
+      // Forcer l'overlay à redescendre instantanément (sans transition)
+      overlay.style.transition = 'none';
+      overlay.style.transform = 'translateY(100%)';
+      
+      // Remettre la transition après un court délai
+      setTimeout(() => {
+        overlay.style.transition = '';
+      }, 50);
+      
+      console.log('✅ Overlay sent back down');
+    }
+    
+    // Retirer la classe transitioning de la galerie
     if (gallery) {
-      gallery.style.transform = 'scale(1)';
+      gallery.classList.remove('transitioning');
+      gallery.style.transform = '';  // Laisser le parallaxe reprendre le contrôle
       gallery.style.opacity = '1';
       gallery.style.pointerEvents = 'auto';
       gallery.style.transition = 'none';
@@ -811,12 +833,7 @@ window.addEventListener('pageshow', function(event) {
       navbar.style.pointerEvents = 'auto';
     }
     
-    const overlay = document.querySelector('.page-transition-overlay');
-    if (overlay) {
-      overlay.classList.remove('active');
-    }
-    
     sessionStorage.removeItem('fromGallery');
-    console.log('✅ Gallery restored');
+    console.log('✅ Gallery restored, parallax reactivated');
   }
 });
