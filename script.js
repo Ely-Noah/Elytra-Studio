@@ -495,7 +495,8 @@ function triggerPageTransition(url) {
   
   if (!overlay) {
     console.warn('⚠️ Overlay not found');
-    window.location.href = url;
+    // ✅ CORRECTION : Utiliser assign au lieu de href pour permettre le retour
+    window.location.assign(url);
     return;
   }
   
@@ -520,7 +521,8 @@ function triggerPageTransition(url) {
   // 4. Naviguer vers la nouvelle page
   setTimeout(() => {
     sessionStorage.setItem('fromGallery', 'true');
-    window.location.href = url;
+    // ✅ CORRECTION : Utiliser assign pour avoir un historique de navigation propre
+    window.location.assign(url);
   }, 1100);
 }
 
@@ -529,11 +531,20 @@ const onPointerUp = (event) => {
   document.body.classList.remove("dragging");
   targetZoom = 1.0;
 
-  if (isClick && Date.now() - clickStartTime < 200) {
-    const endX = event.clientX || event.changedTouches?.[0]?.clientX;
-    const endY = event.clientY || event.changedTouches?.[0]?.clientY;
-
-    if (endX !== undefined && endY !== undefined) {
+  // ✨ CORRECTION : Tolérer un léger mouvement pour le clic (mouvement de caméra)
+  const endX = event.clientX || event.changedTouches?.[0]?.clientX;
+  const endY = event.clientY || event.changedTouches?.[0]?.clientY;
+  
+  if (endX !== undefined && endY !== undefined) {
+    // Calculer la distance de mouvement
+    const deltaX = Math.abs(endX - previousMouse.x);
+    const deltaY = Math.abs(endY - previousMouse.y);
+    const totalMovement = deltaX + deltaY;
+    
+    // Considérer comme un clic si le mouvement est < 10px et temps < 300ms
+    const isRealClick = isClick && Date.now() - clickStartTime < 300 && totalMovement < 10;
+    
+    if (isRealClick) {
       const rect = renderer.domElement.getBoundingClientRect();
       const screenX = ((endX - rect.left) / rect.width) * 2 - 1;
       const screenY = -(((endY - rect.top) / rect.height) * 2 - 1);
