@@ -62,7 +62,7 @@ body.dragging {
 }
 
 /* ========================================
-   🎬 OVERLAY DE TRANSITION AVANCÉE
+   🎬 OVERLAY DE TRANSITION AVANCÉE (CORRIGÉ)
    ======================================== */
 
 .page-transition-overlay {
@@ -72,19 +72,24 @@ body.dragging {
   width: 100%;
   height: 100%;
   background: #000000;
-  z-index: 999998;
+  z-index: 999999999; /* Au-dessus de TOUT */
   pointer-events: none;
   
-  transform: translateY(100%);
+  /* Commence en bas, caché */
+  transform: translateY(100%) !important;
   transition: transform 0.8s cubic-bezier(0.77, 0, 0.175, 1);
   
   display: flex;
   align-items: center;
   justify-content: center;
+  
+  /* Assurer qu'il reste au-dessus */
+  isolation: isolate;
+  will-change: transform;
 }
 
 .page-transition-overlay.active {
-  transform: translateY(0);
+  transform: translateY(0) !important;
   pointer-events: all;
 }
 
@@ -102,6 +107,19 @@ body.dragging {
 .page-transition-overlay.active .transition-loader {
   opacity: 1;
 }
+
+/* Galerie en transition - fade out sans toucher au parallaxe */
+#gallery.transitioning {
+  opacity: 0 !important;
+  transition: opacity 0.6s ease !important;
+}
+
+/* Zoom sur le canvas pour éviter conflit avec transform du parallaxe */
+#gallery.transitioning canvas {
+  transform: scale(0.95) !important;
+  transition: transform 0.8s cubic-bezier(0.77, 0, 0.175, 1) !important;
+}
+
 
 /* NAVBAR */
 .nav-wrap {

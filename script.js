@@ -487,7 +487,7 @@ const onTouchMove = (e) => {
   handleMove(e.touches[0].clientX, e.touches[0].clientY);
 };
 
-// 🎬 FONCTION DE TRANSITION AVANCÉE
+// 🎬 FONCTION DE TRANSITION AVANCÉE (CORRIGÉE)
 function triggerPageTransition(url) {
   const overlay = document.querySelector('.page-transition-overlay');
   const gallery = document.getElementById('gallery');
@@ -495,34 +495,34 @@ function triggerPageTransition(url) {
   
   if (!overlay) {
     console.warn('⚠️ Overlay not found');
-    // ✅ CORRECTION : Utiliser assign au lieu de href pour permettre le retour
-    window.location.assign(url);
+    window.location.href = url;
     return;
   }
   
   console.log('🎬 Starting advanced transition to:', url);
   
+  // ⚠️ CRITIQUE : Arrêter le parallaxe pendant la transition
+  window.isTransitioning = true;
+  
   // 1. Désactiver les interactions
   if (gallery) gallery.style.pointerEvents = 'none';
   if (navbar) navbar.style.pointerEvents = 'none';
   
-  // 2. Zoom arrière + fade out de la galerie
+  // 2. Ajouter la classe de transition (gérée en CSS)
   if (gallery) {
-    gallery.style.transition = 'transform 0.8s cubic-bezier(0.77, 0, 0.175, 1), opacity 0.6s ease';
-    gallery.style.transform = 'scale(0.95)';
-    gallery.style.opacity = '0';
+    gallery.classList.add('transitioning');
   }
   
-  // 3. Faire monter l'overlay noir du bas vers le haut après un court délai
+  // 3. Faire monter l'overlay noir du bas vers le haut
   setTimeout(() => {
     overlay.classList.add('active');
+    console.log('✅ Overlay activated');
   }, 300);
   
   // 4. Naviguer vers la nouvelle page
   setTimeout(() => {
     sessionStorage.setItem('fromGallery', 'true');
-    // ✅ CORRECTION : Utiliser assign pour avoir un historique de navigation propre
-    window.location.assign(url);
+    window.location.href = url;
   }, 1100);
 }
 

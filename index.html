@@ -512,7 +512,7 @@
         }
       });
 
-      // 📷 PARALLAXE DE LA CAMÉRA AU MOUVEMENT DU CURSEUR
+      // 📷 PARALLAXE DE LA CAMÉRA AU MOUVEMENT DU CURSEUR (CORRIGÉ)
       const gallery = document.getElementById('gallery');
       if (gallery && window.innerWidth > 768) {
         let mouseX = 0;
@@ -526,13 +526,16 @@
         });
         
         function animateCameraParallax() {
-          currentX += (mouseX - currentX) * 0.05;
-          currentY += (mouseY - currentY) * 0.05;
-          
-          const moveX = currentX * 15;
-          const moveY = currentY * 15;
-          
-          gallery.style.transform = `translate(${moveX}px, ${moveY}px)`;
+          // ⚠️ NE PAS ANIMER SI UNE TRANSITION EST EN COURS
+          if (!window.isTransitioning) {
+            currentX += (mouseX - currentX) * 0.05;
+            currentY += (mouseY - currentY) * 0.05;
+            
+            const moveX = currentX * 15;
+            const moveY = currentY * 15;
+            
+            gallery.style.transform = `translate(${moveX}px, ${moveY}px)`;
+          }
           
           requestAnimationFrame(animateCameraParallax);
         }
@@ -570,6 +573,68 @@
           }
         });
       }
+    </script>
+
+    <!-- 🎬 GESTION DES CLICS SUR LA NAVBAR ET TRANSITION (CORRIGÉ) -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const navbar = document.querySelector('.nav-wrap');
+        const navLinks = document.querySelectorAll('.nav-wrap a');
+        
+        // ⚠️ EMPÊCHER LES CLICS SUR LA GALERIE QUAND ON CLIQUE SUR LA NAVBAR
+        if (navbar) {
+          navbar.addEventListener('mousedown', function(e) {
+            e.stopPropagation();
+          }, true);
+          
+          navbar.addEventListener('touchstart', function(e) {
+            e.stopPropagation();
+          }, true);
+          
+          navbar.addEventListener('click', function(e) {
+            e.stopPropagation();
+          }, true);
+        }
+        
+        navLinks.forEach(link => {
+          link.addEventListener('click', function(e) {
+            const href = this.getAttribute('href');
+            
+            // Si c'est un lien externe (works.elytra-studio.fr), utiliser la transition
+            if (href && (href.includes('elytra-studio.fr') || href.includes('webflow.io'))) {
+              e.preventDefault();
+              e.stopPropagation();
+              
+              // ⚠️ Marquer qu'une transition est en cours (arrête le parallaxe)
+              window.isTransitioning = true;
+              
+              const overlay = document.querySelector('.page-transition-overlay');
+              const gallery = document.getElementById('gallery');
+              
+              console.log('🎬 Starting transition from navbar to:', href);
+              
+              // Ajouter la classe de transition
+              if (gallery) {
+                gallery.classList.add('transitioning');
+              }
+              
+              // Overlay monte
+              setTimeout(() => {
+                if (overlay) {
+                  overlay.classList.add('active');
+                  console.log('✅ Overlay activated from navbar');
+                }
+              }, 300);
+              
+              // Navigation
+              setTimeout(() => {
+                sessionStorage.setItem('fromGallery', 'true');
+                window.location.href = href;
+              }, 1100);
+            }
+          });
+        });
+      });
     </script>
 
     <!-- 🌍 SCRIPT GLOBE 3D -->
