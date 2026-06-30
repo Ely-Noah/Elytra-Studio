@@ -2,7 +2,7 @@ export const projects = [
   {
     title: "Musée Maritime",
     images: ["./public/museem.webp", "./public/mm2.webp"],
-    year: 1,
+    year: 2025,
     href: "https://works.elytra-studio.fr/musee-maritime",
     tags: ["REBRANDING", "DA", "PRINT"],
   },
