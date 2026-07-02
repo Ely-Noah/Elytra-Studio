@@ -17,6 +17,10 @@ const IS_MOBILE = isAndroidPhone || /iPhone|iPod/.test(UA) || (hasCoarsePointer 
 const IS_TABLET = isIpad || isAndroidTablet || (hasCoarsePointer && !smallViewport);
 const IS_MOBILE_OR_TABLET = IS_MOBILE || IS_TABLET;
 
+// 🦁 Détection Safari (Desktop + iOS) — sert UNIQUEMENT à activer des
+// optimisations spécifiques plus bas, aucun autre navigateur n'est affecté.
+const IS_SAFARI = /^((?!chrome|android|crios|fxios).)*safari/i.test(UA);
+
 const getResponsiveCellSize = () => {
   if (IS_MOBILE) return 0.55;
   if (IS_TABLET) return 0.6;
@@ -260,12 +264,47 @@ const disposeTexture = (texture) => {
   }
 };
 
+// 🦁 SAFARI FIX : sur Chrome/Firefox, recréer un canvas + une texture GPU à
+// chaque rotation d'image est peu coûteux (allocation/suppression async côté
+// driver). Sur Safari/WebKit, ces allocations de texture répétées (jusqu'à
+// plusieurs par seconde avec 31 projets) sont beaucoup plus proches d'appels
+// bloquants sur le thread principal → c'est la cause des saccades/freezes.
+// On réutilise donc le même canvas + la même texture GPU et on se contente
+// de la marquer "needsUpdate", sans jamais recréer/disposer d'objet WebGL.
+const updateImageAtlasInPlace = (currentTextures) => {
+  const atlasTexture = plane.material.uniforms.uImageAtlas.value;
+  const canvas = atlasTexture?.image;
+  if (!canvas) return;
+
+  const ctx = canvas.getContext("2d", { alpha: true, desynchronized: false });
+  const atlasSize = Math.ceil(Math.sqrt(currentTextures.length));
+  const textureSize = canvas.width / atlasSize;
+
+  currentTextures.forEach((texture, index) => {
+    const img = texture?.image;
+    if (!img || !img.complete) return;
+
+    const x = (index % atlasSize) * textureSize;
+    const y = Math.floor(index / atlasSize) * textureSize;
+
+    ctx.clearRect(x, y, textureSize, textureSize);
+    ctx.drawImage(img, x, y, textureSize, textureSize);
+  });
+
+  atlasTexture.needsUpdate = true;
+};
+
 const updateImageAtlas = () => {
   const currentTextures = projects.map((project, index) => {
     const currentIndex = currentImageIndices[index];
     return allImageTextures[index][currentIndex];
   });
-  
+
+  if (IS_SAFARI && plane.material.uniforms.uImageAtlas.value) {
+    updateImageAtlasInPlace(currentTextures);
+    return;
+  }
+
   const oldAtlas = plane.material.uniforms.uImageAtlas.value;
   const newImageAtlas = createTextureAtlas(currentTextures, false);
   plane.material.uniforms.uImageAtlas.value = newImageAtlas;
@@ -578,7 +617,7 @@ const onWindowResize = () => {
   camera.updateProjectionMatrix();
   renderer.setSize(width, height);
   
-  const maxPR = IS_MOBILE ? 2 : (IS_TABLET ? 1.8 : 2);
+  const maxPR = IS_MOBILE ? 2 : (IS_TABLET ? 1.8 : (IS_SAFARI ? 1.5 : 2));
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, maxPR));
   
   plane?.material.uniforms.uResolution.value.set(width, height);
@@ -695,7 +734,10 @@ const init = async () => {
 
   renderer.setSize(container.offsetWidth, container.offsetHeight);
   
-  const maxPR = IS_MOBILE ? 2 : (IS_TABLET ? 1.8 : 2);
+  // 🦁 SAFARI FIX : le fragment shader est coûteux par pixel (smoothstep,
+  // mod, plusieurs zones testées). En plein 2x sur un écran Retina, Safari
+  // encaisse moins bien le fill-rate que Chrome/ANGLE sur le même GPU.
+  const maxPR = IS_MOBILE ? 2 : (IS_TABLET ? 1.8 : (IS_SAFARI ? 1.5 : 2));
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, maxPR));
 
   const bgColor = rgbaToArray(config.backgroundColor);
