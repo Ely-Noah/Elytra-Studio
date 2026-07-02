@@ -184,7 +184,7 @@ export const projects = [
   {
     title: "AXP Event",
     images: ["./public/axp.webp", "./public/axp2.webp"],
-    year: 2025,
+    year: 2026,
     href: "https://works.elytra-studio.fr/axp-event",
     tags: ["BRANDING", "DA", "PRINT"],
   },
