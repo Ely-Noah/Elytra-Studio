@@ -385,8 +385,12 @@ const loadTextures = async () => {
       textTextures.push(createTextTexture(project.title, project.year));
       tagsTextures.push(createTagsTexture(project.tags));
       
-      // Rotation individuelle uniquement sur desktop (ni mobile ni tablette)
-      if (!IS_MOBILE && !IS_TABLET && project.images.length > 1) {
+      // Rotation individuelle uniquement sur desktop (ni mobile, ni tablette, ni Safari)
+      // 🦁 SAFARI FIX : sur Safari, on désactive volontairement les 31 timers
+      // individuels (un par projet) qui, cumulés, changeaient une image
+      // quasiment en continu. Safari passe sur une rotation groupée plus
+      // légère (voir startGlobalRotationSafari).
+      if (!IS_MOBILE && !IS_TABLET && !IS_SAFARI && project.images.length > 1) {
         const randomDelay = Math.random() * 3000;
         setTimeout(() => {
           startImageRotationDesktop(projectIndex);
@@ -447,6 +451,33 @@ function startGlobalRotationTablet() {
   // Rotation personnalisée pour tablette : 2 changements toutes les 3.5 secondes
   const CHANGES_PER_TICK = 3;
   const INTERVAL = 3000;
+
+  globalRotationTimer = setInterval(() => {
+    if (document.hidden) return;
+    
+    for (let i = 0; i < CHANGES_PER_TICK; i++) {
+      const idx = Math.floor(Math.random() * projects.length);
+      const len = allImageTextures[idx].length;
+      if (len > 1) {
+        currentImageIndices[idx] = (currentImageIndices[idx] + 1) % len;
+      }
+    }
+    
+    if (plane?.material.uniforms.uImageAtlas) {
+      updateImageAtlas();
+    }
+  }, INTERVAL);
+}
+
+// 🦁 SAFARI FIX : rotation groupée, beaucoup plus rare et plus discrète.
+// Au lieu de 31 timers indépendants (desktop) ou de 3 changements/3s
+// (mobile/tablette), un seul timer change 1 image toutes les 6 secondes.
+// Ça réduit fortement le nombre d'appels à updateImageAtlas, donc le
+// nombre de redraws du canvas atlas + uploads GPU, sans rien changer pour
+// les autres navigateurs.
+function startGlobalRotationSafari() {
+  const CHANGES_PER_TICK = 1;
+  const INTERVAL = 6000;
 
   globalRotationTimer = setInterval(() => {
     if (document.hidden) return;
@@ -802,7 +833,12 @@ const init = async () => {
     animate();
     
     // Démarrer la rotation appropriée selon le type d'appareil
-    if (IS_MOBILE) {
+    // 🦁 Safari (macOS ou iOS) passe en priorité sur la rotation allégée,
+    // même sur mobile/tablette, car le coût vient du moteur WebKit et pas
+    // de la taille de l'écran.
+    if (IS_SAFARI) {
+      startGlobalRotationSafari();
+    } else if (IS_MOBILE) {
       startGlobalRotationMobile();
     } else if (IS_TABLET) {
       startGlobalRotationTablet();
